@@ -1,5 +1,17 @@
+const Player = (marker, name) => {
+    let score = 0;
+    const getMarker = () => marker;
+    const getName = () => name;
+    const increaseScore = () => score++;
+    const getScore = () => score;
+    const setName = (str) => {
+        name = str;
+    }
+    return {getMarker, getName, getScore, increaseScore, setName};
+};
+
 const gameBoard = (() => {
-    const board = [['','',''],['','',''],['','','']];
+    let board = [['','',''],['','',''],['','','']];
 
     const getBoard = () => {
         return board;
@@ -7,6 +19,10 @@ const gameBoard = (() => {
 
     const changeSquare = (rowIndex, colIndex, marker) => {
         board[rowIndex][colIndex] = marker;
+    }
+
+    const resetBoard = () => {
+        board = [['','',''],['','',''],['','','']];
     }
 
     const checkForWinner = (player) => {
@@ -77,22 +93,13 @@ const gameBoard = (() => {
         });
     };
 
-    return {getBoard, render, changeSquare};
+    return {getBoard, render, changeSquare, resetBoard};
 })();
-
-const Player = (marker, name) => {
-    let score = 0;
-    const getMarker = () => marker;
-    const getName = () => name;
-    const increaseScore = () => score++;
-    const getScore = () => score;
-    return {getMarker, getName, getScore, increaseScore};
-};
 
 const displayController = (() => {
     const players = [Player('X', '1'), Player('O', '2')];
     let currentPlayer = players[0];
-    let playing = true;
+    let playing = false;
 
     const getCurrentPlayer = () => currentPlayer;
 
@@ -101,12 +108,24 @@ const displayController = (() => {
     // end the game
     const declareWinner = (player => {
         if (player) {
-            console.log(`${player.getMarker()} wins!`);
+            alert(`${player.getName()} wins!`);
         } else {
-            console.log('nobody wins!');
+            alert('nobody wins!');
         }
         playing = false;
+
+        
+        playButton.style.display = 'block';
     });
+
+    const startGame = () => {
+        gameBoard.resetBoard();
+        gameBoard.render();
+        playing = true;
+        currentPlayer = players[0];
+        players[0].setName(prompt("player 1 name"));
+        players[1].setName(prompt("player 2 name"));
+    }
 
     const changePlayer = () => {
         if (currentPlayer === players[0]) {
@@ -115,8 +134,14 @@ const displayController = (() => {
             currentPlayer = players[0];
         }
     }
-    return {changePlayer, getCurrentPlayer, declareWinner, getPlaying};
+    return {changePlayer, getCurrentPlayer, declareWinner, getPlaying, startGame};
 })();
 
 
+
 gameBoard.render();
+const playButton = document.querySelector('.play-button');
+playButton.addEventListener('click', () => {
+    playButton.style.display = 'none';
+    displayController.startGame();
+})
